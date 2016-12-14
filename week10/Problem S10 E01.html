@@ -1,0 +1,101 @@
+﻿<html>
+	<head>
+		<style>
+			body { margin: 0; }
+			canvas { width: 100%; height: 100% }
+		</style>
+	</head>
+	<body>
+		<script src="three.min.js"></script>
+		<script src="dat.gui.min.js"></script> <!-- зареждане на dat.GUI -->
+		<script>
+			// Задача: направете чрез dat.GUI възможност да
+			// се контролира както размерът, така и скоростта
+			// на въртене на N случайни кубчета
+			
+	
+			var renderer = new THREE.WebGLRenderer({antialias:true});
+			renderer.setSize( window.innerWidth, window.innerHeight );
+			document.body.appendChild( renderer.domElement );
+
+			var scene = new THREE.Scene();
+
+			var camera = new THREE.PerspectiveCamera( 30, window.innerWidth/window.innerHeight, 0.1, 1000 );
+			camera.position.set(0,0,20);
+
+	
+			// създаване на куб
+			var cubes = [];
+			var N = 200;
+			
+			for(var i =0;i<N;i++){
+				cubes[i] = new THREE.Mesh( 
+				new THREE.BoxGeometry(1,1,1),
+				new THREE.MeshPhongMaterial({color:'gold',shininess: 100}) );
+				
+				cubes[i].position.set(Math.random()*20-10,Math.random()*20-10,Math.random()*20-10);
+				scene.add( cubes[i] );
+				
+			};
+		
+			// светлини
+			var light = new THREE.PointLight();
+			light.position.set (0,0,10);
+			scene.add( light );
+
+			light = new THREE.PointLight();
+			light.position.set (-10,0,0);
+			scene.add( light );
+
+			light = new THREE.PointLight();
+			light.position.set (10,0,0);
+			scene.add( light );
+
+			// слагаме български текстове на бутона за
+			// отваряне и затваряне на панела
+			dat.GUI.TEXT_CLOSED = 'Затвори';
+			dat.GUI.TEXT_OPEN = 'Отвори';
+
+			// създаване на миниатюрния графичен интерфейс
+			// за интерактивна промяна на размера на куба
+			var params = {size:1,speed:1,num:1}; // параметър за контролиране
+			
+			// създаваме панела
+			var gui = new dat.GUI();
+			
+			// добавяме контрол за размера, като указваме
+			// съответното име от параметрите, позволеният
+			// диапазон на промяна и някакво човешко име -
+			// в резултат в панела трябва да се създаде ред
+			// с името, интерактивен слайд-бар и текстово
+			// поле за ръчна промяна на размера
+			gui.add( params, 'size', 0.2, 10 ).name('Размер');
+			gui.add( params, 'speed', 0.2, 10 ).name('Скорост');
+			gui.add( params, 'num', 1, 1000 ).name('Брой');
+			
+
+			function drawFrame()
+			{
+				requestAnimationFrame( drawFrame );
+			
+				// при всяко рисуване на кадър променяме
+				// размера на куба
+				for(var i=0;i<N;i++){
+				cubes[i].scale.x = params.size;
+				cubes[i].scale.y = params.size;
+				cubes[i].scale.z = params.size;
+				
+				
+				// бавно въртене, за да гледаме куба странично
+				cubes[i].rotation.x += 0.011*params.speed;
+				cubes[i].rotation.y += 0.014*params.speed;
+				cubes[i].rotation.z += 0.018*params.speed;
+				}
+				
+				renderer.render( scene, camera );
+			}
+			
+			drawFrame();
+		</script>
+	</body>
+</html>
